@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📚 Library App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h1 { color: #333; }
+    input, button { margin: 5px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    button { cursor: pointer; background: #007bff; color: white; border: none; }
+    button:hover { background: #0056b3; }
+    .box { background: white; padding: 15px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .msg { margin-top: 10px; font-weight: bold; }
+    .success { color: green; }
+    .error { color: red; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 5px; border-bottom: 1px solid #ddd; }
+    #search { margin-bottom: 10px; padding: 8px; width: 50%; }
+  </style>
+</head>
+<body>
+  <h1>📚 Library App</h1>
+
+  <div class="box">
+    <h3>Create User</h3>
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="createUser()">Create User</button>
+    <p id="userResult" class="msg"></p>
+  </div>
+
+  <div class="box">
+    <h3>Create Book</h3>
+    <input type="text" id="title" placeholder="Title">
+    <input type="text" id="author" placeholder="Author">
+    <input type="date" id="published_date" placeholder="Published Date">
+    <input type="text" id="isbn" placeholder="ISBN">
+    <input type="number" id="pages" placeholder="Pages">
+    <input type="text" id="language" placeholder="Language">
+    <input type="text" id="userId" placeholder="User UUID">
+    <button onclick="createBook()">Create Book</button>
+    <p id="bookResult" class="msg"></p>
+  </div>
+
+  <div class="box">
+    <h3>All Books</h3>
+    <input type="text" id="search" placeholder="🔍 Search by title" onkeyup="filterBooks()">
+    <button onclick="getBooks()">Load Books</button>
+    <ul id="booksList"></ul>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000/api";
+    let booksCache = []; 
+
+    async function createUser() {
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!username || !email || !password) {
+        showMsg("userResult", "⚠ Please fill all fields!", "error");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/users/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password })
+        });
+        const result = await res.json();
+        if (res.ok) {
+          showMsg("userResult", " User created successfully!", "success");
+        } else {
+          showMsg("userResult", " " + JSON.stringify(result), "error");
+        }
+      } catch (err) {
+        showMsg("userResult", " Error: " + err, "error");
+      }
+    }
+
+    async function createBook() {
+      const title = document.getElementById("title").value.trim();
+      const author = document.getElementById("author").value.trim();
+      const published_date = document.getElementById("published_date").value;
+      const isbn = document.getElementById("isbn").value.trim();
+      const pages = document.getElementById("pages").value;
+      const language = document.getElementById("language").value.trim();
+      const user = document.getElementById("userId").value.trim();
+
+      if (!title || !author || !published_date || !isbn || !pages || !language || !user) {
+        showMsg("bookResult", "⚠ Please fill all fields!", "error");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/books/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, author, published_date, isbn, pages: parseInt(pages), language, user })
+        });
+        const result = await res.json();
+        if (res.ok) {
+          showMsg("bookResult", " Book created successfully!", "success");
+          getBooks(); // auto refresh
+        } else {
+          showMsg("bookResult", " " + JSON.stringify(result), "error");
+        }
+      } catch (err) {
+        showMsg("bookResult", " Error: " + err, "error");
+      }
+    }
+
+    async function getBooks() {
+      try {
+        const res = await fetch(`${API_BASE}/books/`);
+        const books = await res.json();
+        booksCache = books.results || books; 
+
+        renderBooks(booksCache);
+      } catch (err) {
+        alert("Error loading books: " + err);
+      }
+    }
+
+    function renderBooks(books) {
+      const list = document.getElementById("booksList");
+      list.innerHTML = "";
+      if (books.length === 0) {
+        list.innerHTML = "<li>No books found.</li>";
+        return;
+      }
+      books.forEach(b => {
+        const li = document.createElement("li");
+        li.textContent = `${b.title} by ${b.author} (${b.language})`;
+        list.appendChild(li);
+      });
+    }
+
+    function filterBooks() {
+      const query = document.getElementById("search").value.toLowerCase();
+      const filtered = booksCache.filter(b => b.title.toLowerCase().includes(query));
+      renderBooks(filtered);
+    }
+
+    function showMsg(id, msg, type) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = "msg " + type;
+    }
+  </script>
+</body>
+</html>

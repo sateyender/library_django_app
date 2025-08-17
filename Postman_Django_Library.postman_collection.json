@@ -1,0 +1,87 @@
+{
+  "info": {
+    "name": "Django Library API",
+    "_postman_id": "library-django-api-001",
+    "description": "Collection to test Django REST API for Users and Books",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"john_doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/users/",
+          "protocol": "http",
+          "host": [
+            "127.0.0.1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "users",
+            ""
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get All Users",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/users/",
+          "protocol": "http",
+          "host": [
+            "127.0.0.1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "users",
+            ""
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Book",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"title\": \"Python Basics\",\n    \"author\": \"Jane Smith\",\n    \"published_date\": \"2023-01-15\",\n    \"isbn\": \"978-1234567897\",\n    \"pages\": 250,\n    \"language\": \"English\",\n    \"user\": \"\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/books/",
+          "protocol": "http",
+          "host": [
+            "127.0.0.1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "books",
+            ""
+          ]
+        }
+      }
+    }
+  ]
+}
